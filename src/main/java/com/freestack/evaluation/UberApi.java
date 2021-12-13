@@ -32,7 +32,7 @@ public class UberApi {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
 //je besoin de savoir si il y a un chauffeur disponible, je regarde dans une liste les chauffeurs disponible avec un query
-        List<UberDriver> listofAvailbleDrivers = (List<UberDriver>) em.createQuery("SELECT d FROM UberDriver d WHERE d.available = true").getResultList();
+        List<UberDriver> listofAvailbleDrivers = (List<UberDriver>) em.createQuery("SELECT d FROM UberDriver d WHERE d.available = true").setMaxResults(1).getResultList();
         //si ma liste contiens +0
         if (listofAvailbleDrivers.size() > 0){
             //je vais creer un reservation
@@ -78,8 +78,10 @@ public class UberApi {
 //c'est juste un requete pour avoir la liste des courses/reservations faites
     public static List<Booking> listDriverBookings(UberDriver uberDriver) {
         EntityManager em = emf.createEntityManager();
-        Query query = em.createQuery("SELECT b FROM Booking b");
+        Query query = em.createQuery("SELECT b FROM Booking b where b.uberDriver = :uberDriver").setParameter("uberDriver", uberDriver)
+            .getResultList();
         List<Booking> result = (List<Booking>) query.getResultList();
+        em.close();
         return result;
 
     }
